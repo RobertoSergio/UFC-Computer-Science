@@ -1,0 +1,435 @@
+#include <cmath>
+#include <iostream>
+
+// Definição de cada função
+
+// Método 1
+double bissecao(double a, double b, double epsilon);
+
+// Método 2
+double funcao1(double x);
+double posicao_falsa(double a, double b, double epsilon);
+
+// Método 3
+double funcao2(double x);
+double derivada(double x);
+double newton_raphson(double x0, double epsilon1, double epsilon2, int iterMax);
+
+// Método 4
+double funcao3(double x);
+double secante(double x0, double x1, double epsilon1, double epsilon2,
+               int iterMax);
+
+// Método 5
+double funcao4(double x);
+double derivada2(double x);
+double newton_polinomios(double x, double epsilon1, double epsilon2,
+                         int iterMax);
+
+// Método 6
+double phi(double x);
+double ponto_fixo(double x0, double epsilon1);
+
+// Método 7
+double funcao5(double x);
+double derivada3(double x);
+double newton_raphson2(double x0, double epsilon1, double epsilon2,
+                       int iterMax);
+
+// Método 8
+double phi2(double x);
+double ponto_fixo2(double x0, double epsilon1, double iterMax);
+
+// --------------------------------------------------------------
+// --------------------------------------------------------------
+// Código Completo
+
+// Método 1
+double funcao(double x) { 
+    return -(exp(x) / 2) + 2 * cos(x); 
+    }
+
+double bissecao(double a, double b, double epsilon) {
+  double Fa = funcao(a);
+  double Fb = funcao(b);
+  double intervX = std::abs(b - a);
+  double Fx = 10.0;
+  int k = 0;
+  double x = 0.0;
+
+  while (intervX > epsilon && std::abs(Fx) >= 0.001) {
+    x = (a + b) / 2.0;
+    Fx = funcao(x);
+
+    std::cout << "Iteração " << k + 1 << ":\n";
+    std::cout << "a = " << a << ", Fa = " << Fa << "\n";
+    std::cout << "b = " << b << ", Fb = " << Fb << "\n";
+    std::cout << "x = " << x << ", Fx = " << Fx << "\n\n";
+
+    if (intervX <= epsilon) {
+      break;
+    }
+
+    if (Fa * Fx > 0) {
+      a = x;
+      Fa = Fx;
+    } else {
+      b = x;
+      Fb = Fx;
+    }
+
+    intervX = intervX / 2.0;
+    k++;
+  }
+
+  return x;
+}
+// --------------------------------------------------------------
+// --------------------------------------------------------------
+// Método 2
+
+double funcao1(double x) { 
+    return -(exp(x) / 2) + 2 * cos(x);
+    }
+
+double posicao_falsa(double a, double b, double epsilon) {
+  double Fa = funcao1(a);
+  double Fb = funcao1(b);
+  double x = 0.0;
+  int k = 0;
+  double Fx = 100.0;
+
+  while (std::abs(Fx) >= 0.001) {
+    x = (a * Fb - b * Fa) / (Fb - Fa);
+    double Fx = funcao1(x);
+
+    std::cout << "Iteracao " << k + 1 << ":\n";
+    std::cout << "a = " << a << ", Fa = " << Fa << "\n";
+    std::cout << "b = " << b << ", Fb = " << Fb << "\n";
+    std::cout << "x = " << x << ", Fx = " << Fx << "\n\n";
+
+    if (std::abs(Fx) < epsilon) {
+      return x;
+    }
+
+    if (Fa * Fx > 0) {
+      a = x;
+      Fa = Fx;
+    } else {
+      b = x;
+      Fb = Fx;
+    }
+
+    k++;
+  }
+
+  return x;
+}
+// --------------------------------------------------------------
+// --------------------------------------------------------------
+// Método 3
+
+double funcao2(double x) { return -(exp(x) / 2) + 2 * cos(x); }
+
+double derivada(double x) { return -0.5 * exp(x) - 2 * sin(x); }
+
+double newton_raphson(double x0, double epsilon1, double epsilon2,
+                      int iterMax) {
+  int k = 1;
+
+  while (true) {
+    double fx0 = funcao2(x0);
+    double fpx0 = derivada(x0);
+
+    if (std::abs(fx0) < epsilon1) {
+      return x0;
+    }
+
+    double x1 = x0 - fx0 / fpx0;
+    double fx1 = funcao2(x1);
+    std::cout << "Iteracao " << k << ":\n";
+    std::cout << "x" << k << " = " << x1 << ", f(x" << k << ") = " << fx1
+              << std::endl;
+
+    if (std::abs(fx0) < epsilon1 || std::abs(x1 - x0) < epsilon2 ||
+        k >= iterMax) {
+      return x1;
+    }
+
+    x0 = x1;
+    k++;
+  }
+}
+// --------------------------------------------------------------
+// --------------------------------------------------------------
+// Método 4
+
+double funcao3(double x) { return -(std::exp(x) / 2) + 2 * std::cos(x); }
+
+double secante(double x0, double x1, double epsilon1, double epsilon2,
+               int iterMax) {
+  int k = 1;
+
+  while (true) {
+    double fx0 = funcao3(x0);
+    double fx1 = funcao3(x1);
+
+    if (std::abs(fx0) < epsilon1) {
+      return x0;
+    }
+
+    if (std::abs(fx1) < epsilon1 || std::abs(x1 - x0) < epsilon2) {
+      return x1;
+    }
+
+    double x2 = x1 - (fx1 * (x1 - x0)) / (fx1 - fx0);
+
+    std::cout << "Iteracao " << k + 1 << ":\n";
+    std::cout << "x" << k + 1 << " = " << x2 << ", f(x" << k + 1
+              << ") = " << funcao(x2) << "\n\n";
+
+    if (std::abs(funcao3(x2)) < epsilon1 || std::abs(x2 - x1) < epsilon2 ||
+        k >= iterMax) {
+      return x2;
+    }
+
+    x0 = x1;
+    x1 = x2;
+    k++;
+  }
+}
+// --------------------------------------------------------------
+// --------------------------------------------------------------
+// Método 5
+
+double funcao4(double x) {
+  double r = x * x * x;
+  r = r - 9 * x;
+  r = r + 3;
+  return r;
+}
+
+double derivada2(double x) { return 3 * x * x - 9; }
+
+double newton_polinomios(double x, double epsilon1, double epsilon2,
+                         int iterMax) {
+  double deltax = x;
+
+  for (int k = 1; k <= iterMax; ++k) {
+    double b = funcao4(x);
+    double c = derivada2(x);
+    if (std::abs(b) < epsilon1) {
+      return x;
+    }
+
+    if (std::abs(deltax) < epsilon2) {
+      return x;
+    }
+
+    deltax = b / c;
+    x = x - deltax;
+
+    std::cout << "Iteracao " << k << ":\n";
+    std::cout << "fx = " << b << "\n";
+    std::cout << "fx' = " << c << "\n";
+    std::cout << "raiz = " << x << "\n";
+    std::cout << "FX = " << funcao4(x) << "\n\n";
+  }
+
+  return 0.0;
+}
+// --------------------------------------------------------------
+// --------------------------------------------------------------
+// Método 6
+
+double phi(double x) { return (x * x * x) / 9 + 1.0 / 3; }
+
+double ponto_fixo(double x0, double epsilon1) {
+  double x = x0;
+  int k = 0;
+  double FX = funcao4(x);
+
+  while (std::abs(FX) > epsilon1) {
+    double fx = phi(x); // Aplica a função de iteração φ(x)
+    FX = funcao4(x);
+
+    std::cout << "Iteracao " << k + 1 << ":\n";
+    std::cout << "x0 = " << x << "\n";
+    double aux = x;
+    x = fx; // Atualiza x para o próximo valor
+    FX = funcao4(x);
+    std::cout << "x1 = " << x << "\n";
+    std::cout << "X-x = " << x - aux << "\n";
+    std::cout << "FX = " << FX << "\n\n";
+    k++;
+  }
+
+  return x;
+}
+// --------------------------------------------------------------
+// --------------------------------------------------------------
+// Método 7
+
+double funcao5(double x) {
+  double resultado = x - (x * log(x));
+  return resultado;
+}
+
+double derivada3(double x) {
+  double resultado = -log(x);
+  return resultado;
+}
+
+double newton_raphson2(double x0, double epsilon1, double epsilon2,
+                       int iterMax) {
+  int k = 1;
+
+  while (true) {
+    double fx0 = funcao5(x0);
+    double fpx0 = derivada3(x0);
+    if (std::abs(fx0) < epsilon1) {
+      return x0;
+    }
+
+    double x1 = fx0 / fpx0;
+    x1 = x0 - x1;
+    double fx1 = funcao5(x1);
+
+    std::cout << "Iteracao " << k << ":\n";
+    std::cout << "x" << k << " = " << x1 << ", f(x" << k << ") = " << fx1
+              << "\n";
+
+    if (std::abs(fx0) < epsilon1 || std::abs(x1 - x0) < epsilon2 ||
+        k >= iterMax) {
+      return x1;
+    }
+
+    x0 = x1;
+    k++;
+  }
+}
+// --------------------------------------------------------------
+// --------------------------------------------------------------
+// Método 8
+
+double phi2(double x) {
+  double resultado = log(x);
+
+  return resultado;
+}
+
+double ponto_fixo2(double x0, double epsilon1, double iterMax) {
+  double x = x0;
+  int k = 0;
+  double FX = funcao5(x);
+
+  while (std::abs(FX) > epsilon1) {
+    if (k >= iterMax) {
+      return x0;
+    }
+    double fx = phi2(x); // Aplica a função de iteração φ(x)
+    FX = funcao5(x);
+
+    std::cout << "Iteracao " << k + 1 << ":\n";
+    std::cout << "x0 = " << x << "\n";
+    double aux = x;
+    x = fx; // Atualiza x para o próximo valor
+    FX = funcao5(x);
+    std::cout << "x1 = " << x << "\n";
+    std::cout << "X-x = " << x - aux << "\n";
+    std::cout << "FX = " << FX << "\n\n";
+    k++;
+  }
+
+  return x;
+}
+// --------------------------------------------------------------
+// --------------------------------------------------------------
+// Começando a Main
+
+int main() {
+  double a = 0.0;
+  double b = 1.5707963267948966;
+  double epsilon = 1e-4;
+
+  std::cout << "1° Metodo:" << std::endl;
+  double raiz1 = bissecao(a, b, epsilon);
+
+  std::cout << "A raiz aproximada eh: " << raiz1 << std::endl;
+
+  std::cout << "\n \n \n \n \n \n \n \n \n \n";
+  std::cout << "2° Metodo:" << std::endl;
+  double raiz = posicao_falsa(a, b, epsilon);
+
+  std::cout << "A raiz aproximada eh: " << raiz << std::endl;
+  std::cout << "\n \n \n \n \n \n \n \n \n \n";
+  std::cout << "3° Metodo:" << std::endl;
+  double x0 = 1.0;
+  double epsilon1 = 1e-4;
+  double epsilon2 = 1e-4;
+  int iterMax = 100;
+
+  double raiz2 = newton_raphson(x0, epsilon1, epsilon2, iterMax);
+
+  std::cout << "Angulo encontrado pelo metodo de Newton-Raphson: " << raiz2
+            << std::endl;
+
+  std::cout << "\n \n \n \n \n \n \n \n \n \n";
+  std::cout << "4° Metodo:" << std::endl;
+
+  x0 = 0.5;
+  double x1 = 1.0;
+  epsilon1 = 1e-4;
+  epsilon2 = 1e-4;
+  iterMax = 100;
+
+  raiz = secante(x0, x1, epsilon1, epsilon2, iterMax);
+
+  std::cout << "Angulo encontrado pelo metodo da Secante: " << raiz
+            << std::endl;
+  std::cout << "\n \n \n \n \n \n \n \n \n \n";
+  std::cout << "5° Metodo:" << std::endl;
+
+  x0 = 0.5;
+  epsilon1 = 1e-4;
+  epsilon2 = 1e-4;
+  iterMax = 100;
+
+  raiz = newton_polinomios(x0, epsilon1, epsilon2, iterMax);
+
+  std::cout << "Raiz encontrada pelo metodo polinomios: " << raiz << std::endl;
+
+  std::cout << "\n \n \n \n \n \n \n \n \n \n";
+  std::cout << "6° Metodo:" << std::endl;
+
+  x0 = 0.5;
+  epsilon1 = 5 * 1e-4;
+
+  raiz = ponto_fixo(x0, epsilon1);
+
+  std::cout << "Raiz encontrada de ponto fixo: " << raiz << std::endl;
+
+  std::cout << "\n \n \n \n \n \n \n \n \n \n";
+  std::cout << "7° Metodo:" << std::endl;
+
+  x0 = 2.0;
+  epsilon1 = 1e-5;
+  epsilon2 = 1e-5;
+  iterMax = 100;
+
+  raiz = newton_raphson2(x0, epsilon1, epsilon2, iterMax);
+
+  std::cout << "Raiz encontrada de ponto fixo: " << raiz << std::endl;
+
+  std::cout << "\n \n \n \n \n \n \n \n \n \n";
+  std::cout << "8° Metodo:" << std::endl;
+
+  x0 = 2;
+  epsilon1 = 1e-5;
+
+  raiz = ponto_fixo2(x0, epsilon1, iterMax);
+
+  std::cout << "Raiz encontrada de ponto fixo: " << raiz << std::endl;
+
+  return 0;
+}

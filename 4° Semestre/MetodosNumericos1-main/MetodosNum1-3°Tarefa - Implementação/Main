@@ -1,0 +1,272 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+vector<double> substituicoesSucessivas(const vector<vector<double>>& A, const vector<double>& b) {
+    int n = A.size();
+    vector<double> x(n);
+
+    x[0] = b[0] / A[0][0];
+    for (int i = 1; i < n; i++) {
+        double soma = 0.0;
+        for (int j = 0; j < i; j++) {
+            soma += A[i][j] * x[j];
+        }
+        x[i] = (b[i] - soma) / A[i][i];
+    }
+
+    return x;
+}
+
+vector<double> substituicoesRetroativas(const vector<vector<double>>& A, const vector<double>& b) {
+    int n = A.size();
+    vector<double> x(n);
+
+    x[n - 1] = b[n - 1] / A[n - 1][n - 1];
+    for (int i = n - 2; i >= 0; i--) {
+        double soma = 0.0;
+        for (int j = i + 1; j < n; j++) {
+            soma += A[i][j] * x[j];
+        }
+        x[i] = (b[i] - soma) / A[i][i];
+    }
+
+    return x;
+}
+
+vector<double> eliminacaoGauss(vector<vector<double>> A, vector<double> b) {
+    int n = A.size();
+    for (int k = 0; k < n - 1; k++) {
+        for (int i = k + 1; i < n; i++) {
+            double m = -A[i][k] / A[k][k];
+            A[i][k] = 0.0;
+            for (int j = k + 1; j < n; j++) {
+                A[i][j] = A[i][j] + m * A[k][j];
+            }
+            b[i] = b[i] + m * b[k];
+        }
+    }
+
+    vector<double> x = substituicoesRetroativas(A, b);
+    return x;
+}
+
+vector<double> eliminacaoGauss_Pivot_Parcial(vector<vector<double>> A, vector<double> b) {
+    int n = A.size();
+    for (int k = 0; k < n - 1; k++) {
+        int maxRow = k;
+        for (int i = k + 1; i < n; i++) {
+            if (abs(A[i][k]) > abs(A[maxRow][k])) {
+                maxRow = i;
+            }
+        }
+        swap(A[k], A[maxRow]);
+        swap(b[k], b[maxRow]);
+
+        for (int i = k + 1; i < n; i++) {
+            double m = -A[i][k] / A[k][k];
+            A[i][k] = 0.0;
+            for (int j = k + 1; j < n; j++) {
+                A[i][j] = A[i][j] + m * A[k][j];
+            }
+            b[i] = b[i] + m * b[k];
+        }
+    }
+
+    vector<double> x = substituicoesRetroativas(A, b);
+    return x;
+}
+
+void fatoracaoLU(const vector<vector<double>>& A, vector<vector<double>>& L, vector<vector<double>>& U) {
+    int n = A.size();
+    L = vector<vector<double>>(n, vector<double>(n, 0.0));
+    U = vector<vector<double>>(n, vector<double>(n, 0.0));
+
+    for (int i = 0; i < n; i++) {
+        L[i][i] = 1.0;
+
+        for (int k = i; k < n; k++) {
+            U[i][k] = A[i][k];
+            for (int j = 0; j < i; j++) {
+                U[i][k] -= L[i][j] * U[j][k];
+            }
+        }
+
+        for (int k = i + 1; k < n; k++) {
+            L[k][i] = A[k][i];
+            for (int j = 0; j < i; j++) {
+                L[k][i] -= L[k][j] * U[j][i];
+            }
+            L[k][i] /= U[i][i];
+        }
+    }
+}
+
+vector<double> resolverLU(const vector<vector<double>>& A, const vector<double>& b) {
+    vector<vector<double>> L, U;
+    fatoracaoLU(A, L, U);
+
+    vector<double> y = substituicoesSucessivas(L, b);
+    vector<double> x = substituicoesRetroativas(U, y);
+
+    return x;
+}
+
+void fatoracaoLUComPivoteamento(const vector<vector<double>>& A, vector<vector<double>>& L, vector<vector<double>>& U, vector<int>& P) {
+    int n = A.size();
+    L = vector<vector<double>>(n, vector<double>(n, 0.0));
+    U = vector<vector<double>>(n, vector<double>(n, 0.0));
+    P = vector<int>(n);
+
+    for (int i = 0; i < n; i++) {
+        P[i] = i;
+    }
+
+    for (int i = 0; i < n; i++) {
+        int maxRow = i;
+        for (int k = i + 1; k < n; k++) {
+            if (abs(A[P[k]][i]) > abs(A[P[maxRow]][i])) {
+                maxRow = k;
+            }
+        }
+        swap(P[i], P[maxRow]);
+
+        L[i][i] = 1.0;
+
+        for (int k = i; k < n; k++) {
+            U[i][k] = A[P[i]][k];
+            for (int j = 0; j < i; j++) {
+                U[i][k] -= L[i][j] * U[j][k];
+            }
+        }
+
+        for (int k = i + 1; k < n; k++) {
+            L[k][i] = A[P[k]][i];
+            for (int j = 0; j < i; j++) {
+                L[k][i] -= L[k][j] * U[j][i];
+            }
+            L[k][i] /= U[i][i];
+        }
+    }
+}
+
+vector<double> resolverLUComPivoteamento(const vector<vector<double>>& A, const vector<double>& b) {
+    vector<vector<double>> L, U;
+    vector<int> P;
+    fatoracaoLUComPivoteamento(A, L, U, P);
+
+    vector<double> bPivoted(b.size());
+    for (int i = 0; i < b.size(); i++) {
+        bPivoted[i] = b[P[i]];
+    }
+
+    vector<double> y = substituicoesSucessivas(L, bPivoted);
+    vector<double> x = substituicoesRetroativas(U, y);
+
+    return x;
+}
+
+double calculaDeterminante(vector<vector<double>>& A) {
+    int n = A.size();
+    double det = 1.0;
+
+    for (int i = 0; i < n; i++) {
+        int pivot = i;
+
+        for (int j = i + 1; j < n; j++) {
+            if (abs(A[j][i]) > abs(A[pivot][i])) {
+                pivot = j;
+            }
+        }
+
+        if (i != pivot) {
+            swap(A[i], A[pivot]);
+            det *= -1.0;
+        }
+
+        double pivotValue = A[i][i];
+        if (abs(pivotValue) < 1e-10) {
+            return 0.0;
+        }
+
+        det *= pivotValue;
+
+        for (int j = 0; j < n; j++) {
+            A[i][j] /= pivotValue;
+        }
+
+        for (int k = 0; k < n; k++) {
+            if (k != i) {
+                double factor = A[k][i];
+                for (int j = 0; j < n; j++) {
+                    A[k][j] -= factor * A[i][j];
+                }
+            }
+        }
+    }
+
+    return -det;
+}
+
+vector<vector<double>> calcularMatrizInversa(vector<vector<double>>& A) {
+    int n = A.size();
+    vector<vector<double>> identidade(n, vector<double>(n, 0.0));
+    vector<vector<double>> A_original = A;
+
+    for (int i = 0; i < n; i++) {
+        identidade[i][i] = 1.0;
+    }
+
+    // ... (continuação do código para calcular a matriz inversa)
+}
+
+int main() {
+    cout << "Questão 1\n";
+    double n = 3;
+
+    vector<vector<double>> A = {{20, 7, 9},
+                                {7, 30, 8},
+                                {9, 8, 30}};
+
+    vector<double> b = {16, 38, 38};
+
+    cout << "a)\n";
+    vector<double> resultado = eliminacaoGauss(A, b);
+    cout << "Solucao do sistema usando Eliminacao de GAUSS sem pivotacao:" << endl;
+    for (int i = 0; i < resultado.size(); i++) {
+        cout << "x[" << i + 1 << "] = " << resultado[i] << endl;
+    }
+
+    cout << "\nb)\n";
+    resultado = eliminacaoGauss_Pivot_Parcial(A, b);
+    cout << "Solucao do sistema usando Eliminacao de GAUSS com pivotacao parcial:" << endl;
+    for (int i = 0; i < resultado.size(); i++) {
+        cout << "x[" << i + 1 << "] = " << resultado[i] << endl;
+    }
+
+    cout << "\n\nQuestão 2\n";
+    cout << "a)\n";
+    cout << "Solucao do sistema usando LU sem pivotacao:" << endl;
+    resultado = resolverLU(A, b);
+    for (int i = 0; i < resultado.size(); i++) {
+        cout << "x[" << i + 1 << "] = " << resultado[i] << endl;
+    }
+    cout << "\n";
+    cout << "b)\n";
+    cout << "Solucao do sistema usando LU com pivotacao parcial:" << endl;
+    resultado = resolverLUComPivoteamento(A, b);
+    for (int i = 0; i < resultado.size(); i++) {
+        cout << "x[" << i + 1 << "] = " << resultado[i] << endl;
+    }
+
+    cout << "\n\nQuestão 3\n";
+    cout << "a)\n";
+    double det = calculaDeterminante(A);
+    cout << "Determinante: " << det << endl;
+
+    // Chame a função para calcular a matriz inversa aqui, se necessário
+
+    return 0;
+}

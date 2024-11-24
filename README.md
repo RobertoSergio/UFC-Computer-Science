@@ -12,7 +12,8 @@ Cada pasta neste repositório representa uma disciplina onde desenvolvi **trabal
 - CK0226 - PROGRAMAÇÃO  
 
 ### **Semestre 3**
-- CK0235 - TÉCNICAS DE PROGRAMAÇÃO I  
+- CK0235 - TÉCNICAS DE PROGRAMAÇÃO I
+- CK0111 - ALGORITMOS EM GRAFOS
 
 ### **Semestre 4**  
 - CK0047 - MÉTODOS NUMÉRICOS I  

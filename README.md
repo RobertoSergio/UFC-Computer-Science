@@ -11,8 +11,7 @@ Cada pasta neste repositório representa uma disciplina onde desenvolvi **trabal
 ### **Semestre 2**  
 - CK0226 - PROGRAMAÇÃO  
 
-### **Semestre 3**  
-- CK0220 - LÓGICA PARA CIÊNCIA DA COMPUTAÇÃO  
+### **Semestre 3**
 - CK0235 - TÉCNICAS DE PROGRAMAÇÃO I  
 
 ### **Semestre 4**  

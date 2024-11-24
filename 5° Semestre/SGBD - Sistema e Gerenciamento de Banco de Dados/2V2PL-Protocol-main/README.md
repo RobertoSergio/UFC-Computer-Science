@@ -25,15 +25,3 @@ Este projeto é uma implementação de um protocolo de controle de concorrência
 - Tratamento de bloqueios de atualização para transações que lêem antes de modificar.
 - Sincronização automática das operações de transações para evitar conflitos.
 
-## Como Executar
-
-### Pré-requisitos
-
-- [Python 3.x](https://www.python.org/downloads/) ou outra linguagem (especificar)
-- Bibliotecas necessárias (listar, caso existam)
-
-### Passos
-
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seuusuario/seuprojeto.git

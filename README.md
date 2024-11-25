@@ -19,7 +19,8 @@ Cada pasta neste repositório representa uma disciplina onde desenvolvi **trabal
 - CK0047 - MÉTODOS NUMÉRICOS I  
 - CK0114 - FUNDAMENTOS DE BANCOS DE DADOS  
 - CK0203 - CONSTRUÇÃO E ANÁLISE DE ALGORITMOS  
-- CK0245 - COMPUTAÇÃO GRÁFICA I  
+- CK0245 - COMPUTAÇÃO GRÁFICA I
+- CK0115 - LINGUAGENS DE PROGRAMAÇÃO I
 
 ### **Semestre 5**  
 - CK0048 - MÉTODOS NUMÉRICOS II  

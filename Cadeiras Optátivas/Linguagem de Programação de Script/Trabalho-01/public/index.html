@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AP1 Servidor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-5">
+    <header class="w-full text-center bg-black text-white py-4 rounded-md shadow-md">
+        <h1 class="text-2xl font-bold">AP1 Servidor - Linguagem de Programação Script</h1>
+    </header>
+
+    <main class="w-full max-w-4xl bg-white mt-10 p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-6 text-center text-gray-800">Contador de Valores Enviados</h2>
+        
+        <form id="valueForm" class="flex flex-col items-center gap-4" novalidate>
+            <label for="valueInput" class="text-lg font-medium text-gray-700">Digite um valor:</label>
+            <input 
+                type="text" 
+                id="valueInput" 
+                name="value" 
+                class="border border-gray-300 rounded-md px-4 py-2 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                required 
+                placeholder="Insira um valor"
+            />
+            <button 
+                type="submit" 
+                class="bg-black text-white px-6 py-2 rounded-md font-medium hover:bg-gray-600 transition duration-300"
+            >
+                Enviar
+            </button>
+        </form>
+
+        <div id="result" class="mt-6 text-center text-lg text-gray-700"></div>
+
+        <h2 class="text-xl font-semibold mt-10 text-black text-center">Dados Recebidos</h2>
+        <div class="overflow-x-auto mt-4">
+            <table id="dataTable" class="table-auto w-full border border-black rounded-lg shadow-sm">
+                <thead>
+                    <tr class="bg-black">
+                        <th class="px-4 py-2 text-left text-white">Valor</th>
+                        <th class="px-4 py-2 text-left text-white">Contagem</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-600"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="w-full mt-10 text-center text-gray-600 text-sm">
+        <p>&copy; 2025 AP1 - Trabalho de Script</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

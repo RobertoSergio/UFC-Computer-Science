@@ -33,4 +33,5 @@ Cada pasta neste repositório representa uma disciplina onde desenvolvi **trabal
 
 ### **Cadeiras Optativas**  
 - CK0268 - INTRODUÇÃO À CIÊNCIA DE DADOS  
-- CK0193 - APRENDIZAGEM DE MÁQUINA  
+- CK0193 - APRENDIZAGEM DE MÁQUINA
+- SMD0045 - LINGUAGEM DE PROGRAMAÇÃO SCRIPT

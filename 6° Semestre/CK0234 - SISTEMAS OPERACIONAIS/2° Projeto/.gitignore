@@ -1,0 +1,5 @@
+.vscode/
+Ideia/
+discos/*
+!discos/.gitkeep
+main

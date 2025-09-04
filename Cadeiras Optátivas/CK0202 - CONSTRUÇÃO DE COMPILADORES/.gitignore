@@ -1,0 +1,50 @@
+# Compilação Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Arquivos gerados por IDEs
+/.idea/
+/*.iml
+/.vscode/
+/*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos temporários
+*.tmp
+*.swp
+
+# JavaCC / JFlex gerados
+*.jj~
+*.java~
+*.tokens
+*.out
+*.bak
+
+# Build tools
+/build/
+/target/
+/out/
+
+# Maven
+/.mvn/
+/pom.xml.tag
+/pom.xml.releaseBackup
+/pom.xml.versionsBackup
+/logs/
+
+# Gradle
+.gradle/
+/build/
+
+# Arquivos de testes
+/test-output/
+/*.class
+
+# Arquivos pessoais
+*.env
+*.config

@@ -1,0 +1,374 @@
+PARSER_BEGIN(MiniJavaParser)
+    package br.ufc.compiladores.parser;
+    import br.ufc.compiladores.syntaxtree.*;
+    import br.ufc.compiladores.semant.Symbol;
+
+    public class MiniJavaParser {}
+PARSER_END(MiniJavaParser)
+
+SKIP : { " " | "\t" | "\n" | "\r" }
+
+// Comentário de linha
+SKIP : {
+    < SINGLE_LINE_COMMENT : "//" (~["\n", "\r"])* >
+}
+
+// Comentário de bloco
+SKIP : {
+    < MULTI_LINE_COMMENT : "/*" (~["*"])* "*" (~["/"] (~["*"])* "*" )* "/" >
+}
+
+TOKEN : {
+    < CLASS: "class" > |
+    < PUBLIC: "public" > |
+    < STATIC: "static" > |
+    < VOID: "void" > |
+    < MAIN: "main" > |
+    < EXTENDS: "extends" > |
+    < IF: "if" > |
+    < ELSE: "else" > |
+    < WHILE: "while" > |
+    < RETURN: "return" > |
+    < INT: "int" > |
+    < BOOLEAN: "boolean" > |
+    < TRUE: "true" > |
+    < FALSE: "false" > |
+    < THIS: "this" > |
+    < NEW: "new" > |
+    < STRING: "String" > |
+    < LENGTH: "length" > |
+    < PRINT: "System.out.println" > |
+    < AND: "&&" > |
+    < LT: "<" > |
+    < NOT: "!" > |
+    < ASSIGN: "=" > |
+    < PLUS: "+" > |
+    < MINUS: "-" > |
+    < TIMES: "*" > |
+    < LPAREN: "(" > |
+    < RPAREN: ")" > |
+    < LBRACE: "{" > |
+    < RBRACE: "}" > |
+    < LBRACKET: "[" > |
+    < RBRACKET: "]" > |
+    < SEMICOLON: ";" > |
+    < COMMA: "," > |
+    < DOT: "." > |
+    < IDENTIFIER: (["a"-"z", "A"-"Z"]) (["a"-"z", "A"-"Z", "0"-"9", "_"])* > |
+    < INTEGER_LITERAL: (["0"-"9"])+ >
+}
+
+Program Program() :
+{
+    MainClass m;
+    ClassDeclList c = new ClassDeclList();
+    ClassDecl cd;
+}
+{
+    m = MainClass()
+    (
+        cd = ClassDeclaration() {
+            c.addElement(cd);
+        }
+    )*
+    <EOF>
+    { return new Program(m, c); }
+}
+
+MainClass MainClass() :
+{
+    Identifier id1, id2;
+    Statement s;
+    Token t1, t2;
+}
+{
+    <CLASS> t1 = <IDENTIFIER> <LBRACE>
+        <PUBLIC> <STATIC> <VOID> <MAIN> <LPAREN> <STRING> <LBRACKET> <RBRACKET> t2 = <IDENTIFIER> <RPAREN>
+        <LBRACE> s = Statement() <RBRACE>
+    <RBRACE>
+    {
+        id1 = new Identifier(Symbol.symbol(t1.image));
+        id2 = new Identifier(Symbol.symbol(t2.image));
+        return new MainClass(id1, id2, s);
+    }
+}
+
+ClassDecl ClassDeclaration() :
+{
+    Token id1;
+    Token id2 = null;
+    ClassDecl cd;
+    VarDeclList vl = new VarDeclList();
+    VarDecl v;
+    MethodDeclList ml = new MethodDeclList();
+    MethodDecl m;
+}
+{
+    <CLASS> id1 = <IDENTIFIER> (
+        <EXTENDS> id2 = <IDENTIFIER>
+    )?
+    <LBRACE>
+        (
+            v = VarDeclaration() { vl.addElement(v); }
+        )*
+        (
+            m = MethodDeclaration() { ml.addElement(m); }
+        )*
+    <RBRACE>
+    {
+        if (id2 != null)
+            return new ClassDeclExtends(new Identifier(Symbol.symbol(id1.image)), new Identifier(Symbol.symbol(id2.image)), vl, ml);
+        else
+            return new ClassDeclSimple(new Identifier(Symbol.symbol(id1.image)), vl, ml);
+    }
+}
+
+VarDecl VarDeclaration() :
+{
+    Type t;
+    Token id;
+}
+{
+    t = Type() id = <IDENTIFIER> <SEMICOLON>
+    { return new VarDecl(t, new Identifier(Symbol.symbol(id.image))); }
+}
+
+MethodDecl MethodDeclaration() :
+{
+    Type t, pt;
+    Token id, pid;
+    FormalList fl = new FormalList();
+    VarDeclList vl = new VarDeclList();
+    StatementList sl = new StatementList();
+    Exp e;
+    VarDecl vd;
+    Statement s;
+    Formal f;
+}
+{
+    <PUBLIC> t = Type() id = <IDENTIFIER> <LPAREN>
+    (
+        pt = Type() pid = <IDENTIFIER> {
+            fl.addElement(new Formal(pt, new Identifier(Symbol.symbol(pid.image))));
+        }
+        (
+            <COMMA> pt = Type() pid = <IDENTIFIER> {
+                fl.addElement(new Formal(pt, new Identifier(Symbol.symbol(pid.image))));
+            }
+        )*
+    )?
+    <RPAREN> <LBRACE>
+        (
+            LOOKAHEAD(2)
+            vd = VarDeclaration() {
+                vl.addElement(vd);
+            }
+        )*
+        (
+            s = Statement() {
+                sl.addElement(s);
+            }
+        )*
+    <RETURN> e = Expression() <SEMICOLON> <RBRACE>
+    {
+        return new MethodDecl(t, new Identifier(Symbol.symbol(id.image)), fl, vl, sl, e);
+    }
+}
+
+Type Type() :
+{
+    Token id;
+}
+{
+    LOOKAHEAD(2) <INT> <LBRACKET> <RBRACKET> { return new IntArrayType(); }
+    |
+    LOOKAHEAD(2) <INT> { return new IntegerType(); }  // ← Adicione esta linha
+    |
+    <BOOLEAN> { return new BooleanType(); }
+    |
+    id = <IDENTIFIER> { return new IdentifierType(Symbol.symbol(id.image)); }
+}
+
+Statement Statement() :
+{
+    Statement s1, s2, s3;
+    StatementList sl;
+    Exp e1, e2;
+    Token id;
+}
+{
+    <LBRACE>
+        {
+            sl = new StatementList();
+        }
+        (
+            s1 = Statement() {
+                sl.addElement(s1);
+            }
+        )*
+    <RBRACE>
+    { return new Block(sl); }
+
+    |
+    <IF> <LPAREN> e1 = Expression() <RPAREN> s1 = Statement() <ELSE> s2 = Statement()
+    { return new If(e1, s1, s2); }
+
+    |
+    <WHILE> <LPAREN> e1 = Expression() <RPAREN> s1 = Statement()
+    { return new While(e1, s1); }
+
+    |
+    <PRINT> <LPAREN> e1 = Expression() <RPAREN> <SEMICOLON>
+    { return new Print(e1); }
+
+    |
+    LOOKAHEAD(2) id = <IDENTIFIER> <ASSIGN> e1 = Expression() <SEMICOLON>
+    { return new Assign(new Identifier(Symbol.symbol(id.image)), e1); }
+
+    |
+    LOOKAHEAD(2) id = <IDENTIFIER> <LBRACKET> e1 = Expression() <RBRACKET> <ASSIGN> e2 = Expression() <SEMICOLON>
+    { return new ArrayAssign(new Identifier(Symbol.symbol(id.image)), e1, e2); }
+}
+
+Exp Expression() :
+{
+    Exp e;
+}
+{
+    e = AndExpression() { return e; }
+}
+
+Exp AndExpression() :
+{
+    Exp e1, e2;
+}
+{
+    e1 = LessThanExpression()
+    (
+        <AND> e2 = LessThanExpression() {
+            e1 = new And(e1, e2);
+        }
+    )*
+    { return e1; }
+}
+
+Exp LessThanExpression() :
+{
+    Exp e1, e2;
+}
+{
+    e1 = AdditiveExpression()
+    (
+        <LT> e2 = AdditiveExpression() {
+            e1 = new LessThan(e1, e2);
+        }
+    )*
+    { return e1; }
+}
+
+Exp AdditiveExpression() :
+{
+    Exp e1, e2;
+    Token op;
+}
+{
+    e1 = MultiplicativeExpression()
+    (
+        (op = <PLUS> | op = <MINUS>) e2 = MultiplicativeExpression() {
+            if (op.kind == PLUS)
+                e1 = new Plus(e1, e2);
+            else
+                e1 = new Minus(e1, e2);
+        }
+    )*
+    { return e1; }
+}
+
+Exp MultiplicativeExpression() :
+{
+    Exp e1, e2;
+}
+{
+    e1 = UnaryExpression()
+    (
+        <TIMES> e2 = UnaryExpression() {
+            e1 = new Times(e1, e2);
+        }
+    )*
+    { return e1; }
+}
+
+Exp UnaryExpression() :
+{
+    Exp e;
+}
+{
+    <NOT> e = UnaryExpression() { return new Not(e); }
+    |
+    e = PrimaryExpression() { return e; }
+}
+
+Exp PrimaryExpression() :
+{
+    Token t;
+    Exp e, e2;
+    Identifier id;
+    ExpList el;
+}
+{
+    (
+        t = <INTEGER_LITERAL> { e = new IntegerLiteral(Integer.parseInt(t.image)); }
+        |
+        <TRUE> { e = new True(); }
+        |
+        <FALSE> { e = new False(); }
+        |
+        t = <IDENTIFIER> { e = new IdentifierExp(Symbol.symbol(t.image)); }
+        |
+        <THIS> { e = new This(); }
+        |
+        <NEW>
+        (
+            <INT> <LBRACKET> e2 = Expression() <RBRACKET> { e = new NewArray(e2); }
+            |
+            t = <IDENTIFIER> <LPAREN> <RPAREN> { e = new NewObject(new Identifier(Symbol.symbol(t.image))); }
+        )
+        |
+        <LPAREN> e = Expression() <RPAREN>
+    )
+    (
+        <LBRACKET> e2 = Expression() <RBRACKET> { e = new ArrayLookup(e, e2); }
+        |
+        LOOKAHEAD(2) <DOT> <LENGTH> { e = new ArrayLength(e); }
+        |
+        LOOKAHEAD(2) <DOT> t = <IDENTIFIER> <LPAREN> el = ExpList() <RPAREN> {
+            e = new Call(e, new Identifier(Symbol.symbol(t.image)), el);
+        }
+    )*
+    { return e; }
+}
+
+ExpList ExpList() :
+{
+    Exp e;
+    ExpList el = new ExpList();
+}
+{
+    e = Expression() {
+        el.addElement(e);  
+    }
+    ( ExpRest(el) )*     
+    { return el; }       
+    |
+    { return el; }       
+}
+
+void ExpRest(ExpList el) :
+{
+    Exp e;
+}
+{
+    <COMMA> e = Expression() {
+        el.addElement(e); 
+    }
+}

@@ -36,3 +36,5 @@ Cada pasta neste repositório representa uma disciplina onde desenvolvi **trabal
 - CK0268 - INTRODUÇÃO À CIÊNCIA DE DADOS  
 - CK0193 - APRENDIZAGEM DE MÁQUINA
 - SMD0045 - LINGUAGEM DE PROGRAMAÇÃO SCRIPT
+- CK0202 - CONSTRUÇÃO DE COMPILADORES
+- CK0224 - PADRÕES DE PROJETO DE SOFTWARE
